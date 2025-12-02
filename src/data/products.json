@@ -1,0 +1,159 @@
+{
+  "categories": ["全部", "藥妝", "零食", "家電", "生活雜貨"],
+  "products": [
+    {
+      "id": 1,
+      "name": "龍角散喉糖",
+      "price": 280,
+      "category": "藥妝",
+      "description": "日本原裝進口，清涼舒緩，隨身攜帶方便",
+      "images": [
+        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400",
+        "https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "資生堂ANESSA防曬乳",
+      "price": 850,
+      "category": "藥妝",
+      "description": "SPF50+ PA++++ 超強防護，海邊玩水也不怕",
+      "images": [
+        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400",
+        "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "DHC護唇膏",
+      "price": 220,
+      "category": "藥妝",
+      "description": "橄欖精華滋潤配方，持久保濕不黏膩",
+      "images": [
+        "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "白色戀人餅乾 24入",
+      "price": 680,
+      "category": "零食",
+      "description": "北海道限定，白巧克力夾心，經典伴手禮",
+      "images": [
+        "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400",
+        "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "東京芭娜娜蛋糕",
+      "price": 450,
+      "category": "零食",
+      "description": "東京人氣伴手禮，香蕉奶油內餡，鬆軟可口",
+      "images": [
+        "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "明治巧克力綜合包",
+      "price": 380,
+      "category": "零食",
+      "description": "多種口味一次滿足，送禮自用兩相宜",
+      "images": [
+        "https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=400",
+        "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=400"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Panasonic奈米水離子吹風機",
+      "price": 4200,
+      "category": "家電",
+      "description": "EH-NA0J 最新款，護髮同時快速乾髮",
+      "images": [
+        "https://images.unsplash.com/photo-1522338140262-f46f5913618a?w=400"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "象印保溫瓶 480ml",
+      "price": 980,
+      "category": "家電",
+      "description": "一鍵開蓋，真空保溫保冷，輕量好攜帶",
+      "images": [
+        "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400",
+        "https://images.unsplash.com/photo-1570831739435-6601aa3fa4fb?w=400"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "MUJI無印良品香氛機",
+      "price": 1450,
+      "category": "生活雜貨",
+      "description": "超音波霧化，靜音設計，居家療癒首選",
+      "images": [
+        "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "今治毛巾禮盒組",
+      "price": 1280,
+      "category": "生活雜貨",
+      "description": "日本製造，極致柔軟，高吸水性",
+      "images": [
+        "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400",
+        "https://images.unsplash.com/photo-1583845112203-29329902332e?w=400"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Afternoon Tea茶具組",
+      "price": 1680,
+      "category": "生活雜貨",
+      "description": "精緻陶瓷茶壺配杯組，優雅午茶時光",
+      "images": [
+        "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "樂敦眼藥水",
+      "price": 320,
+      "category": "藥妝",
+      "description": "舒緩眼睛疲勞，清涼感持久，上班族必備",
+      "images": [
+        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400"
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "id": 1,
+      "question": "代購流程是什麼？",
+      "answer": "選擇商品後，透過 LINE 或表單聯繫我們，確認庫存與金額後匯款，我們會在日本當地採購並寄送給您。一般作業時間約 7-14 個工作天。"
+    },
+    {
+      "id": 2,
+      "question": "運費如何計算？",
+      "answer": "運費依包裹重量與體積計算，一般小型包裹約 NT$200-500。滿 NT$3000 可享免運優惠（限台灣本島）。"
+    },
+    {
+      "id": 3,
+      "question": "可以代購網站上沒有的商品嗎？",
+      "answer": "當然可以！只要是日本當地可購買的商品，都歡迎詢問。請提供商品名稱、圖片或連結，我們會盡快報價。"
+    },
+    {
+      "id": 4,
+      "question": "付款方式有哪些？",
+      "answer": "目前提供銀行轉帳、LINE Pay 兩種付款方式。確認訂單後會提供匯款資訊。"
+    },
+    {
+      "id": 5,
+      "question": "商品有保固嗎？",
+      "answer": "電器類商品享有原廠保固，但需自行送修日本。一般消耗品不提供保固，但如有瑕疵會協助處理退換貨。"
+    }
+  ]
+}
+

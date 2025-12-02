@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* 日系簡約風格主題配置 */
+@theme {
+  /* 自訂顏色 */
+  --color-cream: #FAFAF8;
+  --color-charcoal: #2D2D2D;
+  --color-sakura: #F8E1E4;
+  --color-sakura-dark: #E8C1C4;
+  --color-matcha: #D4E4D1;
+  --color-matcha-dark: #B4C4B1;
+  --color-warm-gray: #9B9B9B;
+  --color-light-gray: #F0F0EE;
+  
+  /* 字體 */
+  --font-sans: 'Noto Sans TC', 'Hiragino Sans', 'Microsoft JhengHei', sans-serif;
+}
+
+/* 全域樣式 */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+}
+
+/* 隱藏滾動條但保持滾動功能 */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
