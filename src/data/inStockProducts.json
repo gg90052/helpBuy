@@ -1,17 +1,6 @@
 {
   "products": [
     {
-      "id": "stock_1",
-      "name": "現貨｜ぼりにし Monster Hunter 聯名款",
-      "price": 380,
-      "description": "知名萬用調味粉，它原價就是￥1728，聯名款價格貴不少",
-      "images": [
-        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_0863.jpeg",
-        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_0864.jpeg",
-        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_9614.jpeg"
-      ]
-    },
-    {
       "id": "stock_2",
       "name": "現貨｜韓國辣醬",
       "price": 180,

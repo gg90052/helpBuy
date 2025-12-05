@@ -25,7 +25,7 @@ const IMAGE_UPLOAD_AUTH = import.meta.env.VITE_IMAGE_UPLOAD_AUTH;
 // 表單資料
 const form = ref({
   name: "",
-  price: "",
+  price: "1", // 1 為無售價
   category_id: "",
   description: "",
   images: [],
@@ -47,6 +47,21 @@ const newCategoryName = ref("");
 // 是否為編輯模式
 const isEditMode = computed(() => !!props.product);
 
+// 重置表單
+const resetForm = () => {
+  form.value = {
+    name: "",
+    price: "1",
+    category_id: "",
+    description: "",
+    images: [],
+    is_visible: true,
+  };
+  newImageUrl.value = "";
+  showNewCategoryInput.value = false;
+  newCategoryName.value = "";
+};
+
 // 監聽 product 變化，填入表單
 watch(
   () => props.product,
@@ -54,7 +69,7 @@ watch(
     if (newProduct) {
       form.value = {
         name: newProduct.name || "",
-        price: newProduct.price || "",
+        price: newProduct.price || "1",
         category_id: newProduct.category_id || newProduct.categories?.id || "",
         description: newProduct.description || "",
         images: Array.isArray(newProduct.images) ? [...newProduct.images] : [],
@@ -67,21 +82,6 @@ watch(
   },
   { immediate: true }
 );
-
-// 重置表單
-const resetForm = () => {
-  form.value = {
-    name: "",
-    price: "",
-    category_id: "",
-    description: "",
-    images: [],
-    is_visible: true,
-  };
-  newImageUrl.value = "";
-  showNewCategoryInput.value = false;
-  newCategoryName.value = "";
-};
 
 // 新增圖片網址
 const addImageUrl = () => {
