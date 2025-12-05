@@ -34,6 +34,11 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_IMAGE_UPLOAD_API: ${{ secrets.VITE_IMAGE_UPLOAD_API }}
+          VITE_IMAGE_UPLOAD_AUTH: ${{ secrets.VITE_IMAGE_UPLOAD_AUTH }}
+          VITE_ADMIN_PASSWORD: ${{ secrets.VITE_ADMIN_PASSWORD }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
