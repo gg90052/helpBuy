@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import ProductForm from "./ProductForm.vue";
 import { useProductManager } from "../composables/useProductManager";
 
@@ -37,16 +37,42 @@ const editingProduct = ref(null);
 const showDeleteConfirm = ref(false);
 const deletingProduct = ref(null);
 
+// localStorage key
+const AUTH_STORAGE_KEY = "admin_auth";
+
 // 驗證密碼
 const verifyPassword = () => {
   if (passwordInput.value === ADMIN_PASSWORD) {
     isAuthenticated.value = true;
     passwordError.value = "";
+    // 將密碼存入 localStorage
+    localStorage.setItem(AUTH_STORAGE_KEY, passwordInput.value);
     loadData();
   } else {
     passwordError.value = "密碼錯誤，請重新輸入";
   }
 };
+
+// 檢查 localStorage 中的驗證資訊
+const checkStoredAuth = () => {
+  const storedPassword = localStorage.getItem(AUTH_STORAGE_KEY);
+  if (storedPassword && storedPassword === ADMIN_PASSWORD) {
+    isAuthenticated.value = true;
+    loadData();
+  }
+};
+
+// 登出（清除 localStorage）
+const logout = () => {
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+  isAuthenticated.value = false;
+  passwordInput.value = "";
+};
+
+// 組件掛載時檢查驗證狀態
+onMounted(() => {
+  checkStoredAuth();
+});
 
 // 載入資料
 const loadData = async () => {
@@ -149,6 +175,29 @@ const confirmDelete = async () => {
 const getCategoryName = (product) => {
   return product.categories?.name || "未分類";
 };
+
+// 排序後的商品列表：按最後更新時間降序排列，現貨區放在最後
+const sortedProducts = computed(() => {
+  if (!products.value || products.value.length === 0) return [];
+
+  return [...products.value].sort((a, b) => {
+    const categoryA = a.categories?.name || "";
+    const categoryB = b.categories?.name || "";
+
+    // 現貨區放在最後
+    const isInStockA = categoryA === "現貨區";
+    const isInStockB = categoryB === "現貨區";
+
+    if (isInStockA && !isInStockB) return 1;
+    if (!isInStockA && isInStockB) return -1;
+
+    // 按最後更新時間降序排列（越新的在前面）
+    const timeA = new Date(a.updated_at || a.created_at || 0).getTime();
+    const timeB = new Date(b.updated_at || b.created_at || 0).getTime();
+
+    return timeB - timeA;
+  });
+});
 
 // 格式化價格
 const formatPrice = (price) => {
@@ -253,25 +302,48 @@ const goBack = () => {
                 共 {{ products.length }} 件商品
               </p>
             </div>
-            <!-- 手機版返回按鈕 -->
-            <button
-              @click="goBack"
-              class="sm:hidden p-2 bg-soft-gray hover:bg-light-gray text-charcoal rounded-lg transition-colors"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <!-- 手機版按鈕群組 -->
+            <div class="flex gap-2 sm:hidden">
+              <!-- 手機版登出按鈕 -->
+              <button
+                @click="logout"
+                class="p-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"
+                title="登出"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-            </button>
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              </button>
+              <!-- 手機版返回按鈕 -->
+              <button
+                @click="goBack"
+                class="p-2 bg-soft-gray hover:bg-light-gray text-charcoal rounded-lg transition-colors"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="flex gap-2 sm:gap-3">
             <!-- 桌面版返回按鈕 -->
@@ -293,6 +365,27 @@ const goBack = () => {
                 />
               </svg>
               返回
+            </button>
+            <!-- 登出按鈕 -->
+            <button
+              @click="logout"
+              class="hidden sm:flex px-4 py-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors items-center gap-2"
+              title="登出管理介面"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              登出
             </button>
             <button
               @click="openAddForm"
@@ -388,7 +481,7 @@ const goBack = () => {
           <!-- 手機版：卡片列表 -->
           <div v-else class="md:hidden space-y-3">
             <div
-              v-for="product in products"
+              v-for="product in sortedProducts"
               :key="product.id"
               class="bg-white rounded-xl shadow-sm p-4"
             >
@@ -550,7 +643,7 @@ const goBack = () => {
               </thead>
               <tbody class="divide-y divide-light-gray">
                 <tr
-                  v-for="product in products"
+                  v-for="product in sortedProducts"
                   :key="product.id"
                   class="hover:bg-soft-gray/50 transition-colors"
                 >

@@ -54,9 +54,10 @@ export function useProducts() {
         category: product.categories?.name || "",
         description: product.description || "",
         images: Array.isArray(product.images) ? product.images : [],
+        updated_at: product.updated_at || product.created_at,
       }));
 
-      // 現貨區商品（來自本地 JSON）
+      // 現貨區商品（來自本地 JSON）- 給予最舊的時間讓它排在最後
       const inStockProducts = inStockData.products.map((product) => ({
         id: product.id,
         name: product.name,
@@ -64,11 +65,28 @@ export function useProducts() {
         category: "現貨區",
         description: product.description || "",
         images: Array.isArray(product.images) ? product.images : [],
+        updated_at: null, // 現貨區沒有更新時間
       }));
+
+      // 合併並排序：按最後更新時間降序排列，現貨區放在最後
+      const allProducts = [...dbProducts, ...inStockProducts].sort((a, b) => {
+        // 現貨區放在最後
+        const isInStockA = a.category === "現貨區";
+        const isInStockB = b.category === "現貨區";
+        
+        if (isInStockA && !isInStockB) return 1;
+        if (!isInStockA && isInStockB) return -1;
+        
+        // 按最後更新時間降序排列（越新的在前面）
+        const timeA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+        const timeB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+        
+        return timeB - timeA;
+      });
 
       productsData.value = {
         categories,
-        products: [...inStockProducts, ...dbProducts],
+        products: allProducts,
       };
     } catch (err) {
       error.value = err.message || "載入商品資料時發生錯誤";
