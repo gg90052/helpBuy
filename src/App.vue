@@ -5,16 +5,12 @@ import HeroSection from "./components/HeroSection.vue";
 import ProductList from "./components/ProductList.vue";
 import FAQ from "./components/FAQ.vue";
 import Cart from "./components/Cart.vue";
+import ProductManager from "./components/ProductManager.vue";
 import { useProducts } from "./composables/useProducts";
 
-// Google Sheets Web App URL - 請替換成您的 Google Apps Script Web App URL
-const GOOGLE_SHEETS_URL =
-  "https://script.google.com/macros/s/AKfycbwBmPyIUTmA437Zl4eldXI0xDMs17H4R8KTLk0FEodpBFiq0N-Pjh91N0hdDvEpfehy/exec";
+const { productsData, loading, error, fetchProducts } = useProducts();
 
-const { productsData, loading, error, fetchProducts } =
-  useProducts(GOOGLE_SHEETS_URL);
-
-// 商品資料一律從 Google Sheets 取得
+// 商品資料從 Supabase 取得
 const categories = computed(() => {
   return productsData.value?.categories || [];
 });
@@ -97,7 +93,7 @@ const goToProducts = () => {
         />
 
         <!-- FAQ Section -->
-        <FAQ :faqs="faqs" />
+        <!-- <FAQ :faqs="faqs" /> -->
       </template>
 
       <template v-else-if="currentView === 'cart'">
@@ -105,6 +101,11 @@ const goToProducts = () => {
         <div class="pt-16">
           <Cart @goToProducts="goToProducts" />
         </div>
+      </template>
+
+      <template v-else-if="currentView === 'admin'">
+        <!-- Admin Section -->
+        <ProductManager @back="navigate('home')" />
       </template>
     </main>
   </div>

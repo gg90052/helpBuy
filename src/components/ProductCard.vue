@@ -1,68 +1,85 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useCart } from '../composables/useCart'
+import { ref, computed } from "vue";
+import { useCart } from "../composables/useCart";
+import ImageLightbox from "./ImageLightbox.vue";
 
 const props = defineProps({
   product: {
     type: Object,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const { addToCart } = useCart()
+const { addToCart } = useCart();
 
-const currentImageIndex = ref(0)
-const quantity = ref(1)
-const showAdded = ref(false)
+const currentImageIndex = ref(0);
+const quantity = ref(1);
+const showAdded = ref(false);
+const showLightbox = ref(false);
 
-const hasMultipleImages = computed(() => props.product.images.length > 1)
+const hasMultipleImages = computed(() => props.product.images.length > 1);
 
 const nextImage = () => {
   if (hasMultipleImages.value) {
-    currentImageIndex.value = (currentImageIndex.value + 1) % props.product.images.length
+    currentImageIndex.value =
+      (currentImageIndex.value + 1) % props.product.images.length;
   }
-}
+};
 
 const prevImage = () => {
   if (hasMultipleImages.value) {
-    currentImageIndex.value = currentImageIndex.value === 0
-      ? props.product.images.length - 1
-      : currentImageIndex.value - 1
+    currentImageIndex.value =
+      currentImageIndex.value === 0
+        ? props.product.images.length - 1
+        : currentImageIndex.value - 1;
   }
-}
+};
 
 const goToImage = (index) => {
-  currentImageIndex.value = index
-}
+  currentImageIndex.value = index;
+};
 
 const formatPrice = (price) => {
-  return new Intl.NumberFormat('zh-TW').format(price)
-}
+  return new Intl.NumberFormat("zh-TW").format(price);
+};
 
 const increaseQty = () => {
-  quantity.value++
-}
+  quantity.value++;
+};
 
 const decreaseQty = () => {
   if (quantity.value > 1) {
-    quantity.value--
+    quantity.value--;
   }
-}
+};
 
 const handleAddToCart = () => {
-  addToCart(props.product, quantity.value)
-  showAdded.value = true
+  addToCart(props.product, quantity.value);
+  showAdded.value = true;
   setTimeout(() => {
-    showAdded.value = false
-  }, 1500)
-  quantity.value = 1
-}
+    showAdded.value = false;
+  }, 1500);
+  quantity.value = 1;
+};
+
+const openLightbox = () => {
+  showLightbox.value = true;
+};
+
+const closeLightbox = () => {
+  showLightbox.value = false;
+};
 </script>
 
 <template>
-  <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 group">
+  <article
+    class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 group"
+  >
     <!-- Image Container -->
-    <div class="relative aspect-square overflow-hidden bg-light-gray">
+    <div
+      class="relative aspect-square overflow-hidden bg-light-gray cursor-pointer"
+      @click="openLightbox"
+    >
       <!-- Images -->
       <div class="relative w-full h-full">
         <img
@@ -72,7 +89,7 @@ const handleAddToCart = () => {
           :alt="`${product.name} - 圖片 ${index + 1}`"
           :class="[
             'absolute inset-0 w-full h-full object-cover transition-opacity duration-500',
-            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            index === currentImageIndex ? 'opacity-100' : 'opacity-0',
           ]"
           loading="lazy"
         />
@@ -85,8 +102,18 @@ const handleAddToCart = () => {
           class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white"
           aria-label="上一張圖片"
         >
-          <svg class="w-4 h-4 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <svg
+            class="w-4 h-4 text-charcoal"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <button
@@ -94,8 +121,18 @@ const handleAddToCart = () => {
           class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white"
           aria-label="下一張圖片"
         >
-          <svg class="w-4 h-4 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <svg
+            class="w-4 h-4 text-charcoal"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
 
@@ -109,7 +146,7 @@ const handleAddToCart = () => {
               'w-2 h-2 rounded-full transition-all duration-300',
               index === currentImageIndex
                 ? 'bg-charcoal w-4'
-                : 'bg-white/70 hover:bg-white'
+                : 'bg-white/70 hover:bg-white',
             ]"
             :aria-label="`前往圖片 ${index + 1}`"
           />
@@ -117,7 +154,9 @@ const handleAddToCart = () => {
       </template>
 
       <!-- Category Badge -->
-      <span class="absolute top-3 left-3 px-3 py-1 bg-cream/90 backdrop-blur-sm rounded-full text-xs text-charcoal">
+      <span
+        class="absolute top-3 left-3 px-3 py-1 bg-cream/90 backdrop-blur-sm rounded-full text-xs text-charcoal"
+      >
         {{ product.category }}
       </span>
     </div>
@@ -130,8 +169,11 @@ const handleAddToCart = () => {
       <p class="text-sm text-warm-gray mb-3 line-clamp-3 h-[3.75rem]">
         {{ product.description }}
       </p>
-      <p class="text-lg font-medium text-sakura-dark mb-3">
-        NT$ {{ formatPrice(product.price) }}
+      <p
+        class="text-lg font-medium text-sakura-dark mb-3"
+        :class="{ invisible: product.price <= 1 }"
+      >
+        日幣參考價格：￥{{ formatPrice(product.price) }}
       </p>
 
       <!-- Quantity Selector -->
@@ -143,17 +185,39 @@ const handleAddToCart = () => {
             class="w-8 h-8 flex items-center justify-center text-charcoal hover:bg-light-gray transition-colors"
             :disabled="quantity <= 1"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20 12H4"
+              />
             </svg>
           </button>
-          <span class="w-8 text-center text-sm font-medium">{{ quantity }}</span>
+          <span class="w-8 text-center text-sm font-medium">{{
+            quantity
+          }}</span>
           <button
             @click="increaseQty"
             class="w-8 h-8 flex items-center justify-center text-charcoal hover:bg-light-gray transition-colors"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
           </button>
         </div>
@@ -166,11 +230,19 @@ const handleAddToCart = () => {
           'w-full py-2.5 rounded-lg text-sm font-medium transition-all duration-300',
           showAdded
             ? 'bg-matcha text-charcoal'
-            : 'bg-charcoal text-cream hover:bg-charcoal/90'
+            : 'bg-charcoal text-cream hover:bg-charcoal/90',
         ]"
       >
-        {{ showAdded ? '已加入購物清單 ✓' : '加入購物清單' }}
+        {{ showAdded ? "已加入購物清單 ✓" : "加入購物清單" }}
       </button>
     </div>
+
+    <!-- Lightbox -->
+    <ImageLightbox
+      :images="product.images"
+      :initial-index="currentImageIndex"
+      :visible="showLightbox"
+      @close="closeLightbox"
+    />
   </article>
 </template>

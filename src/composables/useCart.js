@@ -1,6 +1,39 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
-const cartItems = ref([])
+const STORAGE_KEY = 'helpbuy_cart'
+
+// 從 localStorage 載入購物車資料
+const loadCartFromStorage = () => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (error) {
+    console.error('載入購物車資料失敗:', error)
+  }
+  return []
+}
+
+// 儲存購物車資料到 localStorage
+const saveCartToStorage = (items) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+  } catch (error) {
+    console.error('儲存購物車資料失敗:', error)
+  }
+}
+
+const cartItems = ref(loadCartFromStorage())
+
+// 監聽購物車變化，自動儲存到 localStorage
+watch(
+  cartItems,
+  (newItems) => {
+    saveCartToStorage(newItems)
+  },
+  { deep: true }
+)
 
 export function useCart() {
   const addToCart = (product, quantity = 1) => {
@@ -12,7 +45,7 @@ export function useCart() {
       cartItems.value.push({
         id: product.id,
         name: product.name,
-        price: product.price,
+        image: product.images?.[0] || null,
         quantity: quantity
       })
     }
@@ -38,13 +71,9 @@ export function useCart() {
 
   const clearCart = () => {
     cartItems.value = []
+    // 清除 localStorage
+    localStorage.removeItem(STORAGE_KEY)
   }
-
-  const cartTotal = computed(() => {
-    return cartItems.value.reduce((total, item) => {
-      return total + (item.price * item.quantity)
-    }, 0)
-  })
 
   const cartCount = computed(() => {
     return cartItems.value.reduce((count, item) => count + item.quantity, 0)
@@ -56,8 +85,6 @@ export function useCart() {
     removeFromCart,
     updateQuantity,
     clearCart,
-    cartTotal,
     cartCount
   }
 }
-

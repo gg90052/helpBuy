@@ -1,69 +1,71 @@
 <script setup>
-import { ref } from 'vue'
-import { useCart } from '../composables/useCart'
+import { ref } from "vue";
+import { useCart } from "../composables/useCart";
 
-const { cartCount } = useCart()
+const { cartCount } = useCart();
 
-const isMenuOpen = ref(false)
+const isMenuOpen = ref(false);
 
 defineProps({
   currentView: {
     type: String,
-    default: 'home'
-  }
-})
+    default: "home",
+  },
+});
 
-const emit = defineEmits(['navigate'])
+const emit = defineEmits(["navigate"]);
 
 const navItems = [
-  { name: '首頁', view: 'home' },
-  { name: '商品', href: '#products' },
-  { name: 'FAQ', href: '#faq' }
-]
+  { name: "首頁", view: "home" },
+  { name: "商品", href: "#products" },
+  { name: "管理", view: "admin" },
+];
 
 const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value
-}
+  isMenuOpen.value = !isMenuOpen.value;
+};
 
 const closeMenu = () => {
-  isMenuOpen.value = false
-}
+  isMenuOpen.value = false;
+};
 
 const handleNavClick = (item) => {
-  closeMenu()
+  closeMenu();
   if (item.view) {
-    emit('navigate', item.view)
+    emit("navigate", item.view);
   } else if (item.href) {
-    emit('navigate', 'home')
+    emit("navigate", "home");
     // 延遲滾動以確保頁面已切換
     setTimeout(() => {
-      const element = document.querySelector(item.href)
+      const element = document.querySelector(item.href);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
+        element.scrollIntoView({ behavior: "smooth" });
       }
-    }, 100)
+    }, 100);
   }
-}
+};
 
 const goToCart = () => {
-  closeMenu()
-  emit('navigate', 'cart')
-}
+  closeMenu();
+  emit("navigate", "cart");
+};
 
 const goHome = () => {
-  closeMenu()
-  emit('navigate', 'home')
-}
+  closeMenu();
+  emit("navigate", "home");
+};
 </script>
 
 <template>
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-light-gray">
+  <nav
+    class="fixed top-0 left-0 right-0 z-50 bg-cream/95 backdrop-blur-sm border-b border-light-gray"
+  >
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <button @click="goHome" class="flex items-center gap-2">
+        <button @click="goHome" class="flex items-center gap-2 cursor-pointer">
           <span class="text-xl font-medium text-charcoal">
-            <span class="text-sakura-dark">日本</span>代購
+            Teddy的<span class="text-sakura-dark">日本</span>代購
           </span>
         </button>
 
@@ -77,21 +79,31 @@ const goHome = () => {
           >
             {{ item.name }}
           </button>
-          
+
           <!-- Cart Button -->
           <button
             @click="goToCart"
             class="relative flex items-center gap-1 text-warm-gray hover:text-charcoal transition-colors duration-200"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             <span class="text-sm">購物清單</span>
             <span
               v-if="cartCount > 0"
               class="absolute -top-2 -right-2 w-5 h-5 bg-sakura-dark text-white text-xs rounded-full flex items-center justify-center"
             >
-              {{ cartCount > 99 ? '99+' : cartCount }}
+              {{ cartCount > 99 ? "99+" : cartCount }}
             </span>
           </button>
         </div>
@@ -99,18 +111,25 @@ const goHome = () => {
         <!-- Mobile: Cart + Menu Button -->
         <div class="md:hidden flex items-center gap-3">
           <!-- Cart Button -->
-          <button
-            @click="goToCart"
-            class="relative p-2 text-charcoal"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          <button @click="goToCart" class="relative p-2 text-charcoal">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             <span
               v-if="cartCount > 0"
               class="absolute top-0 right-0 w-5 h-5 bg-sakura-dark text-white text-xs rounded-full flex items-center justify-center"
             >
-              {{ cartCount > 99 ? '99+' : cartCount }}
+              {{ cartCount > 99 ? "99+" : cartCount }}
             </span>
           </button>
 
@@ -127,7 +146,12 @@ const goHome = () => {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
             <svg
               v-else
@@ -136,7 +160,12 @@ const goHome = () => {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
