@@ -50,6 +50,18 @@ const formatPrice = (price) => {
   return new Intl.NumberFormat("zh-TW").format(price);
 };
 
+// 將文字中的 URL 轉換為超連結
+const linkifyText = (text) => {
+  if (!text) return "";
+
+  // 匹配 http://、https:// 開頭的 URL
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  return text.replace(urlRegex, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-sakura-dark underline hover:text-sakura-dark/80">${url}</a>`;
+  });
+};
+
 const handleAddToCart = () => {
   addToCart(props.product, 1);
   showAdded.value = true;
@@ -210,9 +222,10 @@ const handleTouchEnd = (e) => {
       <h3 class="font-medium text-charcoal mb-1 line-clamp-1">
         {{ product.name }}
       </h3>
-      <p class="text-sm text-warm-gray mb-3 line-clamp-3 h-[3.75rem]">
-        {{ product.description }}
-      </p>
+      <div
+        class="text-sm text-warm-gray mb-3 line-clamp-3 h-[3.75rem]"
+        v-html="linkifyText(product.description)"
+      ></div>
       <p
         class="text-lg font-medium text-sakura-dark mb-3"
         :class="{ invisible: product.price <= 1 }"
