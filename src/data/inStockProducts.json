@@ -2,31 +2,24 @@
   "products": [
     {
       "id": "stock_1",
-      "name": "現貨｜龍角散喉糖 蜂蜜檸檬味",
-      "price": 280,
-      "description": "日本原裝進口，限量現貨，下單後 1-2 天出貨",
+      "name": "現貨｜ぼりにし Monster Hunter 聯名款",
+      "price": 380,
+      "description": "知名萬用調味粉，它原價就是￥1728，聯名款價格貴不少",
       "images": [
-        "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400"
+        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_0863.jpeg",
+        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_0864.jpeg",
+        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_9614.jpeg"
       ]
     },
     {
       "id": "stock_2",
-      "name": "現貨｜北海道薯條三兄弟",
-      "price": 350,
-      "description": "超人氣伴手禮，現貨供應中，數量有限",
-      "images": [
-        "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400"
-      ]
-    },
-    {
-      "id": "stock_3",
-      "name": "現貨｜樂敦曼秀雷敦護唇膏",
+      "name": "現貨｜韓國辣醬",
       "price": 180,
-      "description": "日本藥妝店人氣商品，滋潤保濕，現貨即出",
+      "description": "雖然它是韓國買的，不過就加減放一下吧",
       "images": [
-        "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400"
+        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_0865.jpeg",
+        "https://pub-0ede5073a9d840e690e0fedd425280b6.r2.dev/%E5%A4%A7IMG_0866.jpeg"
       ]
     }
   ]
 }
-

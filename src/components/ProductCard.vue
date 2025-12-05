@@ -13,11 +13,18 @@ const props = defineProps({
 const { addToCart } = useCart();
 
 const currentImageIndex = ref(0);
-const quantity = ref(1);
 const showAdded = ref(false);
 const showLightbox = ref(false);
 
+// 觸摸滑動相關
+const touchStartX = ref(0);
+const touchEndX = ref(0);
+const touchStartY = ref(0);
+const touchEndY = ref(0);
+const swipeThreshold = 50; // 滑動閾值（像素）
+
 const hasMultipleImages = computed(() => props.product.images.length > 1);
+const isInStock = computed(() => props.product.category === "現貨區");
 
 const nextImage = () => {
   if (hasMultipleImages.value) {
@@ -43,23 +50,12 @@ const formatPrice = (price) => {
   return new Intl.NumberFormat("zh-TW").format(price);
 };
 
-const increaseQty = () => {
-  quantity.value++;
-};
-
-const decreaseQty = () => {
-  if (quantity.value > 1) {
-    quantity.value--;
-  }
-};
-
 const handleAddToCart = () => {
-  addToCart(props.product, quantity.value);
+  addToCart(props.product, 1);
   showAdded.value = true;
   setTimeout(() => {
     showAdded.value = false;
   }, 1500);
-  quantity.value = 1;
 };
 
 const openLightbox = () => {
@@ -68,6 +64,43 @@ const openLightbox = () => {
 
 const closeLightbox = () => {
   showLightbox.value = false;
+};
+
+// 觸摸事件處理
+const handleTouchStart = (e) => {
+  if (!hasMultipleImages.value) return;
+  const touch = e.touches[0];
+  touchStartX.value = touch.clientX;
+  touchStartY.value = touch.clientY;
+};
+
+const handleTouchMove = (e) => {
+  // 允許滑動，但不做任何視覺反饋
+  e.preventDefault();
+};
+
+const handleTouchEnd = (e) => {
+  if (!hasMultipleImages.value) return;
+  const touch = e.changedTouches[0];
+  touchEndX.value = touch.clientX;
+  touchEndY.value = touch.clientY;
+
+  const deltaX = touchStartX.value - touchEndX.value;
+  const deltaY = touchStartY.value - touchEndY.value;
+
+  // 判斷是否為水平滑動（水平距離大於垂直距離）
+  if (
+    Math.abs(deltaX) > Math.abs(deltaY) &&
+    Math.abs(deltaX) > swipeThreshold
+  ) {
+    if (deltaX > 0) {
+      // 向左滑動，顯示下一張
+      nextImage();
+    } else {
+      // 向右滑動，顯示上一張
+      prevImage();
+    }
+  }
 };
 </script>
 
@@ -79,6 +112,9 @@ const closeLightbox = () => {
     <div
       class="relative aspect-square overflow-hidden bg-light-gray cursor-pointer"
       @click="openLightbox"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
     >
       <!-- Images -->
       <div class="relative w-full h-full">
@@ -173,55 +209,13 @@ const closeLightbox = () => {
         class="text-lg font-medium text-sakura-dark mb-3"
         :class="{ invisible: product.price <= 1 }"
       >
-        日幣參考價格：￥{{ formatPrice(product.price) }}
+        <template v-if="isInStock">
+          NTD ${{ formatPrice(product.price) }}
+        </template>
+        <template v-else>
+          日幣參考價格：￥{{ formatPrice(product.price) }}
+        </template>
       </p>
-
-      <!-- Quantity Selector -->
-      <div class="flex items-center gap-2 mb-3">
-        <span class="text-sm text-warm-gray">數量</span>
-        <div class="flex items-center border border-light-gray rounded-lg">
-          <button
-            @click="decreaseQty"
-            class="w-8 h-8 flex items-center justify-center text-charcoal hover:bg-light-gray transition-colors"
-            :disabled="quantity <= 1"
-          >
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20 12H4"
-              />
-            </svg>
-          </button>
-          <span class="w-8 text-center text-sm font-medium">{{
-            quantity
-          }}</span>
-          <button
-            @click="increaseQty"
-            class="w-8 h-8 flex items-center justify-center text-charcoal hover:bg-light-gray transition-colors"
-          >
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
 
       <!-- Add to Cart Button -->
       <button

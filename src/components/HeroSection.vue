@@ -19,6 +19,7 @@
           </p>
           <p class="text-warm-gray leading-relaxed">
             以下商品皆為靈感參考，有需要其他商品也可以直接跟我說！
+            點擊圖片可以放大
           </p>
         </div>
       </div>
