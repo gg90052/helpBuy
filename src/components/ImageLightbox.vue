@@ -100,8 +100,16 @@ const handleTouchStart = (e) => {
 };
 
 const handleTouchMove = (e) => {
-  // 允許滑動，但不做任何視覺反饋
-  e.preventDefault();
+  // 只在確定是水平滑動時才阻止默認行為，允許垂直滾動
+  if (!hasMultipleImages.value || isTransitioning.value) return;
+  const touch = e.touches[0];
+  const deltaX = Math.abs(touch.clientX - touchStartX.value);
+  const deltaY = Math.abs(touch.clientY - touchStartY.value);
+
+  // 如果水平移動距離大於垂直移動距離，才阻止默認行為
+  if (deltaX > deltaY) {
+    e.preventDefault();
+  }
 };
 
 const handleTouchEnd = (e) => {
