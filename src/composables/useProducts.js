@@ -55,6 +55,7 @@ export function useProducts() {
         description: product.description || "",
         images: Array.isArray(product.images) ? product.images : [],
         updated_at: product.updated_at || product.created_at,
+        is_pinned: product.is_pinned || false,
       }));
 
       // 現貨區商品（來自本地 JSON）- 給予最舊的時間讓它排在最後
@@ -66,9 +67,10 @@ export function useProducts() {
         description: product.description || "",
         images: Array.isArray(product.images) ? product.images : [],
         updated_at: null, // 現貨區沒有更新時間
+        is_pinned: false, // 現貨區預設不置頂
       }));
 
-      // 合併並排序：按最後更新時間降序排列，現貨區放在最後
+      // 合併並排序：置頂優先 > 按最後更新時間降序排列 > 現貨區放在最後
       const allProducts = [...dbProducts, ...inStockProducts].sort((a, b) => {
         // 現貨區放在最後
         const isInStockA = a.category === "現貨區";
@@ -76,6 +78,13 @@ export function useProducts() {
         
         if (isInStockA && !isInStockB) return 1;
         if (!isInStockA && isInStockB) return -1;
+        
+        // 置頂優先
+        const isPinnedA = a.is_pinned || false;
+        const isPinnedB = b.is_pinned || false;
+        
+        if (isPinnedA && !isPinnedB) return -1;
+        if (!isPinnedA && isPinnedB) return 1;
         
         // 按最後更新時間降序排列（越新的在前面）
         const timeA = a.updated_at ? new Date(a.updated_at).getTime() : 0;

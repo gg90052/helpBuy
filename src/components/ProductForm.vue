@@ -30,6 +30,7 @@ const form = ref({
   description: "",
   images: [],
   is_visible: true,
+  is_pinned: false,
 });
 
 // 新圖片網址輸入
@@ -56,6 +57,7 @@ const resetForm = () => {
     description: "",
     images: [],
     is_visible: true,
+    is_pinned: false,
   };
   newImageUrl.value = "";
   showNewCategoryInput.value = false;
@@ -75,6 +77,8 @@ watch(
         images: Array.isArray(newProduct.images) ? [...newProduct.images] : [],
         is_visible:
           newProduct.is_visible !== undefined ? newProduct.is_visible : true,
+        is_pinned:
+          newProduct.is_pinned !== undefined ? newProduct.is_pinned : false,
       };
     } else {
       resetForm();
@@ -195,6 +199,7 @@ const handleSubmit = () => {
     description: form.value.description.trim(),
     images: form.value.images,
     is_visible: form.value.is_visible,
+    is_pinned: form.value.is_pinned,
   });
 };
 
@@ -339,6 +344,29 @@ const handleCancel = () => {
         </button>
         <span class="text-sm text-warm-gray">
           {{ form.is_visible ? "顯示在前端" : "隱藏（不顯示在前端）" }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 置頂狀態 -->
+    <div>
+      <label class="block text-sm font-medium text-charcoal mb-1.5">
+        置頂
+      </label>
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          @click="form.is_pinned = !form.is_pinned"
+          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-sakura focus:ring-offset-2"
+          :class="form.is_pinned ? 'bg-amber-500' : 'bg-light-gray'"
+        >
+          <span
+            class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+            :class="form.is_pinned ? 'translate-x-6' : 'translate-x-1'"
+          ></span>
+        </button>
+        <span class="text-sm text-warm-gray">
+          {{ form.is_pinned ? "置頂顯示" : "一般排序" }}
         </span>
       </div>
     </div>

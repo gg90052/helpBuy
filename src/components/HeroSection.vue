@@ -15,7 +15,7 @@
             想要聖誕節禮物？ 來得及！
           </p>
           <p class="text-warm-gray leading-relaxed mb-3">
-            價格計算用0.22計算，然後再依據物品體積追加50-100元
+            價格計算用0.23計算，然後再依據物品體積追加50-100元
           </p>
           <p class="text-warm-gray leading-relaxed">
             以下商品皆為靈感參考，有需要其他商品也可以直接跟我說！

@@ -15,6 +15,7 @@ const {
   updateProduct,
   deleteProduct,
   toggleProductVisibility,
+  toggleProductPinned,
 } = useProductManager();
 
 // 密碼驗證
@@ -176,7 +177,7 @@ const getCategoryName = (product) => {
   return product.categories?.name || "未分類";
 };
 
-// 排序後的商品列表：按最後更新時間降序排列，現貨區放在最後
+// 排序後的商品列表：置頂優先 > 最後更新時間降序 > 現貨區放在最後
 const sortedProducts = computed(() => {
   if (!products.value || products.value.length === 0) return [];
 
@@ -190,6 +191,13 @@ const sortedProducts = computed(() => {
 
     if (isInStockA && !isInStockB) return 1;
     if (!isInStockA && isInStockB) return -1;
+
+    // 置頂優先
+    const isPinnedA = a.is_pinned || false;
+    const isPinnedB = b.is_pinned || false;
+
+    if (isPinnedA && !isPinnedB) return -1;
+    if (!isPinnedA && isPinnedB) return 1;
 
     // 按最後更新時間降序排列（越新的在前面）
     const timeA = new Date(a.updated_at || a.created_at || 0).getTime();
@@ -211,6 +219,19 @@ const handleToggleVisibility = async (product) => {
       product.id,
       product.is_visible
     );
+    const index = products.value.findIndex((p) => p.id === product.id);
+    if (index !== -1) {
+      products.value[index] = updated;
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+// 切換商品置頂狀態
+const handleTogglePinned = async (product) => {
+  try {
+    const updated = await toggleProductPinned(product.id, product.is_pinned);
     const index = products.value.findIndex((p) => p.id === product.id);
     if (index !== -1) {
       products.value[index] = updated;
@@ -502,6 +523,12 @@ const goBack = () => {
                       {{ product.name }}
                     </h3>
                     <span
+                      v-if="product.is_pinned"
+                      class="px-2 py-0.5 text-xs bg-amber-100 text-amber-600 rounded"
+                    >
+                      置頂
+                    </span>
+                    <span
                       v-if="!product.is_visible"
                       class="px-2 py-0.5 text-xs bg-warm-gray/20 text-warm-gray rounded"
                     >
@@ -518,6 +545,31 @@ const goBack = () => {
               </div>
               <!-- 操作按鈕 -->
               <div class="flex gap-2 mt-3 pt-3 border-t border-light-gray">
+                <button
+                  @click="handleTogglePinned(product)"
+                  class="px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                  :class="
+                    product.is_pinned
+                      ? 'text-amber-600 bg-amber-100 hover:bg-amber-200'
+                      : 'text-warm-gray bg-soft-gray hover:bg-light-gray'
+                  "
+                  :title="product.is_pinned ? '取消置頂' : '置頂'"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                    />
+                  </svg>
+                  {{ product.is_pinned ? "置頂" : "置頂" }}
+                </button>
                 <button
                   @click="handleToggleVisibility(product)"
                   class="px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-center gap-1.5"
@@ -662,9 +714,17 @@ const goBack = () => {
                         "
                       />
                       <div>
-                        <p class="font-medium text-charcoal">
-                          {{ product.name }}
-                        </p>
+                        <div class="flex items-center gap-2">
+                          <p class="font-medium text-charcoal">
+                            {{ product.name }}
+                          </p>
+                          <span
+                            v-if="product.is_pinned"
+                            class="px-1.5 py-0.5 text-xs bg-amber-100 text-amber-600 rounded"
+                          >
+                            置頂
+                          </span>
+                        </div>
                         <span
                           v-if="!product.is_visible"
                           class="text-xs text-warm-gray"
@@ -731,6 +791,30 @@ const goBack = () => {
                   </td>
                   <td class="px-6 py-4">
                     <div class="flex items-center justify-center gap-2">
+                      <button
+                        @click="handleTogglePinned(product)"
+                        class="p-2 rounded-lg transition-colors"
+                        :class="
+                          product.is_pinned
+                            ? 'text-amber-600 bg-amber-100 hover:bg-amber-200'
+                            : 'text-warm-gray hover:text-amber-600 hover:bg-amber-50'
+                        "
+                        :title="product.is_pinned ? '取消置頂' : '置頂'"
+                      >
+                        <svg
+                          class="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                          />
+                        </svg>
+                      </button>
                       <button
                         @click="openEditForm(product)"
                         class="p-2 text-warm-gray hover:text-sakura-dark hover:bg-sakura/10 rounded-lg transition-colors"

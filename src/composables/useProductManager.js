@@ -82,6 +82,7 @@ export function useProductManager() {
             description: product.description,
             images: product.images || [],
             is_visible: product.is_visible !== undefined ? product.is_visible : true,
+            is_pinned: product.is_pinned !== undefined ? product.is_pinned : false,
           },
         ])
         .select(
@@ -123,6 +124,7 @@ export function useProductManager() {
           description: product.description,
           images: product.images || [],
           is_visible: product.is_visible !== undefined ? product.is_visible : true,
+          is_pinned: product.is_pinned !== undefined ? product.is_pinned : false,
           updated_at: new Date().toISOString(),
         })
         .eq("id", id)
@@ -211,6 +213,43 @@ export function useProductManager() {
     }
   };
 
+  // 切換商品置頂狀態
+  const toggleProductPinned = async (id, currentPinned) => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const { data, error: updateError } = await supabase
+        .from("products")
+        .update({
+          is_pinned: !currentPinned,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select(
+          `
+          *,
+          categories (
+            id,
+            name
+          )
+        `
+        )
+        .single();
+
+      if (updateError) {
+        throw new Error(`切換置頂狀態失敗: ${updateError.message}`);
+      }
+
+      return data;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     loading,
     error,
@@ -221,6 +260,7 @@ export function useProductManager() {
     updateProduct,
     deleteProduct,
     toggleProductVisibility,
+    toggleProductPinned,
   };
 }
 
