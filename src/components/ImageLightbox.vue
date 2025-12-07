@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, watchEffect } from "vue";
 
 const props = defineProps({
   images: {
@@ -30,12 +30,17 @@ const swipeThreshold = 50; // 滑動閾值（像素）
 
 const hasMultipleImages = computed(() => props.images.length > 1);
 
-// 監聽 visible 變化，重置索引
+// 監聽 visible 變化，重置索引並管理 body 滾動
 watch(
   () => props.visible,
   (newVal) => {
     if (newVal) {
       currentIndex.value = props.initialIndex;
+      // 防止背景滾動
+      document.body.style.overflow = "hidden";
+    } else {
+      // 恢復背景滾動
+      document.body.style.overflow = "";
     }
   }
 );
@@ -138,8 +143,6 @@ const handleTouchEnd = (e) => {
 
 // 鍵盤事件處理
 const handleKeydown = (e) => {
-  if (!props.visible) return;
-
   switch (e.key) {
     case "Escape":
       handleClose();
@@ -155,12 +158,14 @@ const handleKeydown = (e) => {
   }
 };
 
-onMounted(() => {
-  document.addEventListener("keydown", handleKeydown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleKeydown);
+// 優化：只在 lightbox 可見時才監聽鍵盤事件
+watchEffect((onCleanup) => {
+  if (props.visible) {
+    document.addEventListener("keydown", handleKeydown);
+    onCleanup(() => {
+      document.removeEventListener("keydown", handleKeydown);
+    });
+  }
 });
 </script>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 import CategoryTabs from "./CategoryTabs.vue";
 import ProductCard from "./ProductCard.vue";
 
@@ -26,6 +26,21 @@ const emit = defineEmits(["retry"]);
 
 const activeCategory = ref("全部");
 const searchQuery = ref("");
+const debouncedQuery = ref(""); // 防抖後的搜尋值
+
+// 防抖處理：減少不必要的重新計算
+let debounceTimer = null;
+watch(searchQuery, (val) => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    debouncedQuery.value = val;
+  }, 300); // 300ms 防抖延遲
+});
+
+// 清理定時器
+onUnmounted(() => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+});
 
 const filteredProducts = computed(() => {
   let filtered = props.products;
@@ -37,9 +52,9 @@ const filteredProducts = computed(() => {
     );
   }
 
-  // 再根據搜尋關鍵字篩選
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.trim().toLowerCase();
+  // 再根據搜尋關鍵字篩選（使用防抖後的值）
+  if (debouncedQuery.value.trim()) {
+    const query = debouncedQuery.value.trim().toLowerCase();
     filtered = filtered.filter((product) => {
       const name = (product.name || "").toLowerCase();
       const description = (product.description || "").toLowerCase();
@@ -180,7 +195,7 @@ const filteredProducts = computed(() => {
           </svg>
         </div>
         <p class="text-warm-gray">
-          {{ searchQuery ? "找不到符合搜尋條件的商品" : "此分類目前沒有商品" }}
+          {{ debouncedQuery ? "找不到符合搜尋條件的商品" : "此分類目前沒有商品" }}
         </p>
       </div>
     </div>

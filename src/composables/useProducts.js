@@ -6,8 +6,23 @@ const productsData = ref(null);
 const loading = ref(false);
 const error = ref(null);
 
+// 快取相關設定
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 分鐘快取
+
 export function useProducts() {
-  const fetchProducts = async () => {
+  /**
+   * 取得商品資料
+   * @param {boolean} forceRefresh - 是否強制重新載入（忽略快取）
+   */
+  const fetchProducts = async (forceRefresh = false) => {
+    const now = Date.now();
+    
+    // 如果有快取且未過期，直接返回（除非強制刷新）
+    if (!forceRefresh && productsData.value && (now - lastFetchTime < CACHE_DURATION)) {
+      return;
+    }
+    
     loading.value = true;
     error.value = null;
 
@@ -97,6 +112,9 @@ export function useProducts() {
         categories,
         products: allProducts,
       };
+      
+      // 更新快取時間
+      lastFetchTime = Date.now();
     } catch (err) {
       error.value = err.message || "載入商品資料時發生錯誤";
       console.error("載入商品資料錯誤:", err);

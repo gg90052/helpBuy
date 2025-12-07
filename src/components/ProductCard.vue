@@ -26,6 +26,19 @@ const swipeThreshold = 50; // 滑動閾值（像素）
 const hasMultipleImages = computed(() => props.product.images.length > 1);
 const isInStock = computed(() => props.product.category === "現貨區");
 
+// 將文字中的 URL 轉換為超連結（使用 computed 快取結果）
+const linkedDescription = computed(() => {
+  const text = props.product.description;
+  if (!text) return "";
+
+  // 匹配 http://、https:// 開頭的 URL
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  return text.replace(urlRegex, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-sakura-dark underline hover:text-sakura-dark/80">${url}</a>`;
+  });
+});
+
 const nextImage = () => {
   if (hasMultipleImages.value) {
     currentImageIndex.value =
@@ -48,18 +61,6 @@ const goToImage = (index) => {
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat("zh-TW").format(price);
-};
-
-// 將文字中的 URL 轉換為超連結
-const linkifyText = (text) => {
-  if (!text) return "";
-
-  // 匹配 http://、https:// 開頭的 URL
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-
-  return text.replace(urlRegex, (url) => {
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-sakura-dark underline hover:text-sakura-dark/80">${url}</a>`;
-  });
 };
 
 const handleAddToCart = () => {
@@ -136,19 +137,18 @@ const handleTouchEnd = (e) => {
       @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
     >
-      <!-- Images -->
+      <!-- Images - 優化：只渲染當前圖片，減少 DOM 節點 -->
       <div class="relative w-full h-full">
-        <img
-          v-for="(image, index) in product.images"
-          :key="index"
-          :src="image"
-          :alt="`${product.name} - 圖片 ${index + 1}`"
-          :class="[
-            'absolute inset-0 w-full h-full object-cover transition-opacity duration-500',
-            index === currentImageIndex ? 'opacity-100' : 'opacity-0',
-          ]"
-          loading="lazy"
-        />
+        <Transition name="fade" mode="out-in">
+          <img
+            :key="currentImageIndex"
+            :src="product.images[currentImageIndex]"
+            :alt="`${product.name} - 圖片 ${currentImageIndex + 1}`"
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </Transition>
       </div>
 
       <!-- Navigation Arrows (only show if multiple images) -->
@@ -224,7 +224,7 @@ const handleTouchEnd = (e) => {
       </h3>
       <div
         class="text-sm text-warm-gray mb-3 line-clamp-3 h-[3.75rem]"
-        v-html="linkifyText(product.description)"
+        v-html="linkedDescription"
       ></div>
       <p
         class="text-lg font-medium text-sakura-dark mb-3"
@@ -261,3 +261,16 @@ const handleTouchEnd = (e) => {
     />
   </article>
 </template>
+
+<style scoped>
+/* 圖片切換動畫 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

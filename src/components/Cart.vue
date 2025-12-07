@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useCart } from "../composables/useCart";
-import html2canvas from "html2canvas";
+// html2canvas 改為動態載入，減少首屏載入時間
 
 const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart();
 
@@ -16,7 +16,7 @@ const handleGoToProducts = () => {
   emit("goToProducts");
 };
 
-// 儲存為圖片
+// 儲存為圖片（動態載入 html2canvas）
 const saveAsImage = async () => {
   if (!cartRef.value || isSaving.value) return;
 
@@ -27,6 +27,9 @@ const saveAsImage = async () => {
   await new Promise((resolve) => setTimeout(resolve, 100));
 
   try {
+    // 動態載入 html2canvas，只在需要時才載入
+    const html2canvas = (await import("html2canvas")).default;
+    
     const canvas = await html2canvas(cartRef.value, {
       backgroundColor: "#FAF8F5", // cream 背景色
       scale: 2, // 提高解析度
