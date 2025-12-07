@@ -133,19 +133,66 @@ const handleFileSelect = async (event) => {
   event.target.value = "";
 };
 
+// 壓縮圖片至長邊 1024px
+const compressImage = (file, maxSize = 1024) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      img.src = e.target.result;
+    };
+
+    img.onload = () => {
+      // 計算縮放比例
+      let { width, height } = img;
+      if (width > maxSize || height > maxSize) {
+        if (width > height) {
+          height = (height / width) * maxSize;
+          width = maxSize;
+        } else {
+          width = (width / height) * maxSize;
+          height = maxSize;
+        }
+      }
+
+      // 使用 Canvas 縮放
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 輸出為 Blob (JPEG 品質 0.85)
+      canvas.toBlob(
+        (blob) => resolve(blob),
+        "image/jpeg",
+        0.85
+      );
+    };
+
+    img.onerror = reject;
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 // 上傳圖片到 API
 const uploadImage = async (file) => {
   uploading.value = true;
   uploadError.value = "";
 
   try {
+    // 先壓縮圖片
+    const compressedBlob = await compressImage(file);
+
     const response = await fetch(IMAGE_UPLOAD_API, {
       method: "PUT",
       headers: {
         "X-Custom-Auth": IMAGE_UPLOAD_AUTH,
-        "Content-Type": file.type,
+        "Content-Type": "image/jpeg", // 壓縮後統一為 JPEG
       },
-      body: file,
+      body: compressedBlob, // 上傳壓縮後的 Blob
     });
 
     if (!response.ok) {

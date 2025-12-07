@@ -6,7 +6,7 @@
   --color-cream: #FAFAF8;
   --color-charcoal: #2D2D2D;
   --color-sakura: #F8E1E4;
-  --color-sakura-dark: #E8C1C4;
+  --color-sakura-dark: #B56B70; /* Improved contrast ratio (>4.5:1) for WCAG AA compliance */
   --color-matcha: #D4E4D1;
   --color-matcha-dark: #B4C4B1;
   --color-warm-gray: #9B9B9B;

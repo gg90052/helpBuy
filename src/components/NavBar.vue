@@ -63,7 +63,7 @@ const goHome = () => {
     <div class="max-w-6xl mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <button @click="goHome" class="flex items-center gap-2 cursor-pointer">
+        <button @click="goHome" class="flex items-center gap-2 cursor-pointer" aria-label="返回首頁">
           <span class="text-xl font-medium text-charcoal">
             Teddy的<span class="text-sakura-dark">日本</span>代購
           </span>
@@ -111,7 +111,7 @@ const goHome = () => {
         <!-- Mobile: Cart + Menu Button -->
         <div class="md:hidden flex items-center gap-3">
           <!-- Cart Button -->
-          <button @click="goToCart" class="relative p-2 text-charcoal">
+          <button @click="goToCart" class="relative p-2 text-charcoal" aria-label="購物清單">
             <svg
               class="w-6 h-6"
               fill="none"

@@ -96,6 +96,7 @@ const filteredProducts = computed(() => {
               v-if="searchQuery"
               @click="searchQuery = ''"
               class="absolute right-3 top-1/2 transform -translate-y-1/2 text-warm-gray hover:text-charcoal transition-colors"
+              aria-label="清除搜尋"
             >
               <svg
                 class="w-5 h-5"
@@ -166,9 +167,10 @@ const filteredProducts = computed(() => {
         class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
       >
         <ProductCard
-          v-for="product in filteredProducts"
+          v-for="(product, index) in filteredProducts"
           :key="product.id"
           :product="product"
+          :priority="index < 4"
         />
       </div>
 

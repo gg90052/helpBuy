@@ -8,22 +8,17 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  priority: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { addToCart } = useCart();
 
-const currentImageIndex = ref(0);
 const showAdded = ref(false);
 const showLightbox = ref(false);
 
-// 觸摸滑動相關
-const touchStartX = ref(0);
-const touchEndX = ref(0);
-const touchStartY = ref(0);
-const touchEndY = ref(0);
-const swipeThreshold = 50; // 滑動閾值（像素）
-
-const hasMultipleImages = computed(() => props.product.images.length > 1);
 const isInStock = computed(() => props.product.category === "現貨區");
 
 // 將文字中的 URL 轉換為超連結（使用 computed 快取結果）
@@ -38,26 +33,6 @@ const linkedDescription = computed(() => {
     return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-sakura-dark underline hover:text-sakura-dark/80">${url}</a>`;
   });
 });
-
-const nextImage = () => {
-  if (hasMultipleImages.value) {
-    currentImageIndex.value =
-      (currentImageIndex.value + 1) % props.product.images.length;
-  }
-};
-
-const prevImage = () => {
-  if (hasMultipleImages.value) {
-    currentImageIndex.value =
-      currentImageIndex.value === 0
-        ? props.product.images.length - 1
-        : currentImageIndex.value - 1;
-  }
-};
-
-const goToImage = (index) => {
-  currentImageIndex.value = index;
-};
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat("zh-TW").format(price);
@@ -78,51 +53,6 @@ const openLightbox = () => {
 const closeLightbox = () => {
   showLightbox.value = false;
 };
-
-// 觸摸事件處理
-const handleTouchStart = (e) => {
-  if (!hasMultipleImages.value) return;
-  const touch = e.touches[0];
-  touchStartX.value = touch.clientX;
-  touchStartY.value = touch.clientY;
-};
-
-const handleTouchMove = (e) => {
-  // 只在確定是水平滑動時才阻止默認行為，允許垂直滾動
-  if (!hasMultipleImages.value) return;
-  const touch = e.touches[0];
-  const deltaX = Math.abs(touch.clientX - touchStartX.value);
-  const deltaY = Math.abs(touch.clientY - touchStartY.value);
-
-  // 如果水平移動距離大於垂直移動距離，才阻止默認行為
-  if (deltaX > deltaY) {
-    e.preventDefault();
-  }
-};
-
-const handleTouchEnd = (e) => {
-  if (!hasMultipleImages.value) return;
-  const touch = e.changedTouches[0];
-  touchEndX.value = touch.clientX;
-  touchEndY.value = touch.clientY;
-
-  const deltaX = touchStartX.value - touchEndX.value;
-  const deltaY = touchStartY.value - touchEndY.value;
-
-  // 判斷是否為水平滑動（水平距離大於垂直距離）
-  if (
-    Math.abs(deltaX) > Math.abs(deltaY) &&
-    Math.abs(deltaX) > swipeThreshold
-  ) {
-    if (deltaX > 0) {
-      // 向左滑動，顯示下一張
-      nextImage();
-    } else {
-      // 向右滑動，顯示上一張
-      prevImage();
-    }
-  }
-};
 </script>
 
 <template>
@@ -133,81 +63,18 @@ const handleTouchEnd = (e) => {
     <div
       class="relative aspect-square overflow-hidden bg-light-gray cursor-pointer"
       @click="openLightbox"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-      @touchend="handleTouchEnd"
     >
-      <!-- Images - 優化：只渲染當前圖片，減少 DOM 節點 -->
+      <!-- Images - 只顯示第一張圖片 -->
       <div class="relative w-full h-full">
-        <Transition name="fade" mode="out-in">
-          <img
-            :key="currentImageIndex"
-            :src="product.images[currentImageIndex]"
-            :alt="`${product.name} - 圖片 ${currentImageIndex + 1}`"
-            class="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        </Transition>
+        <img
+          :src="product.images[0]"
+          :alt="`${product.name} - 圖片 1`"
+          class="absolute inset-0 w-full h-full object-cover"
+          :loading="priority ? 'eager' : 'lazy'"
+          :fetchpriority="priority ? 'high' : 'auto'"
+          decoding="async"
+        />
       </div>
-
-      <!-- Navigation Arrows (only show if multiple images) -->
-      <template v-if="hasMultipleImages">
-        <button
-          @click.stop="prevImage"
-          class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white"
-          aria-label="上一張圖片"
-        >
-          <svg
-            class="w-4 h-4 text-charcoal"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <button
-          @click.stop="nextImage"
-          class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white"
-          aria-label="下一張圖片"
-        >
-          <svg
-            class="w-4 h-4 text-charcoal"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-
-        <!-- Dots Indicator -->
-        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-          <button
-            v-for="(_, index) in product.images"
-            :key="index"
-            @click.stop="goToImage(index)"
-            :class="[
-              'w-2 h-2 rounded-full transition-all duration-300',
-              index === currentImageIndex
-                ? 'bg-charcoal w-4'
-                : 'bg-white/70 hover:bg-white',
-            ]"
-            :aria-label="`前往圖片 ${index + 1}`"
-          />
-        </div>
-      </template>
 
       <!-- Category Badge -->
       <span
@@ -255,22 +122,11 @@ const handleTouchEnd = (e) => {
     <!-- Lightbox -->
     <ImageLightbox
       :images="product.images"
-      :initial-index="currentImageIndex"
+      :initial-index="0"
       :visible="showLightbox"
       @close="closeLightbox"
     />
   </article>
 </template>
 
-<style scoped>
-/* 圖片切換動畫 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
+<style scoped></style>
