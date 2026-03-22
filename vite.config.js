@@ -13,8 +13,6 @@ export default defineConfig({
         manualChunks: {
           // 將 Vue 核心分離
           vue: ["vue"],
-          // 將 Supabase 分離（較大的依賴）
-          supabase: ["@supabase/supabase-js"],
         },
       },
     },
@@ -31,6 +29,6 @@ export default defineConfig({
   },
   // 優化依賴預構建
   optimizeDeps: {
-    include: ["vue", "@supabase/supabase-js"],
+    include: ["vue"],
   },
 });
