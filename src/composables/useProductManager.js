@@ -7,14 +7,24 @@ const error = ref(null);
 export function useProductManager() {
   // 取得所有類別（不含「全部」）
   const fetchCategories = async () => {
-    const res = await api.get('/api/categories');
-    return res.data;
+    try {
+      const res = await api.get('/api/categories');
+      return res.data;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    }
   };
 
   // 取得所有商品（含類別資訊）
   const fetchProducts = async () => {
-    const res = await api.get('/api/products');
-    return res.data;
+    try {
+      const res = await api.get('/api/products');
+      return res.data;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    }
   };
 
   // 新增類別

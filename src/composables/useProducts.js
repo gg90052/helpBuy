@@ -38,11 +38,11 @@ export function useProducts() {
       const categories = [
         "全部",
         "現貨區",
-        ...categoriesRes.data.map((cat) => cat.name),
+        ...(Array.isArray(categoriesRes.data) ? categoriesRes.data : []).map((cat) => cat.name),
       ];
 
       // 轉換商品資料格式（來自 Worker API）
-      const dbProducts = productsRes.data.map((product) => ({
+      const dbProducts = (Array.isArray(productsRes.data) ? productsRes.data : []).map((product) => ({
         id: product.id,
         name: product.name,
         price: product.price,

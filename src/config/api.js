@@ -5,7 +5,19 @@ const request = async (path, options = {}) => {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   })
-  if (!res.ok) throw new Error(`API 錯誤: ${res.status}`)
+
+  if (!res.ok) {
+    let serverMessage = ''
+    try {
+      const body = await res.json()
+      serverMessage = body.error || body.message || ''
+    } catch {}
+    throw new Error(`API 錯誤 ${res.status}: ${serverMessage || res.statusText} (${options.method || 'GET'} ${path})`)
+  }
+
+  // 204 No Content 沒有 body，直接回傳 null
+  if (res.status === 204) return null
+
   return res.json()
 }
 
