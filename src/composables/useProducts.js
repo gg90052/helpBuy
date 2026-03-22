@@ -1,5 +1,5 @@
 import { ref, onMounted } from "vue";
-import { supabase } from "../config/supabase";
+import { api } from "../config/api";
 import inStockData from "../data/inStockProducts.json";
 
 const productsData = ref(null);
@@ -17,52 +17,32 @@ export function useProducts() {
    */
   const fetchProducts = async (forceRefresh = false) => {
     const now = Date.now();
-    
+
     // 如果有快取且未過期，直接返回（除非強制刷新）
     if (!forceRefresh && productsData.value && (now - lastFetchTime < CACHE_DURATION)) {
       return;
     }
-    
+
     loading.value = true;
     error.value = null;
 
     try {
       // 同時取得類別和商品資料
-      const [categoriesResult, productsResult] = await Promise.all([
-        supabase.from("categories").select("*").order("id"),
-        supabase
-          .from("products")
-          .select(
-            `
-            *,
-            categories (
-              name
-            )
-          `
-          )
-          .eq("is_visible", true)
-          .order("id"),
+      const [categoriesRes, productsRes] = await Promise.all([
+        api.get('/api/categories'),
+        api.get('/api/products?visible=true'),
       ]);
 
-      // 檢查錯誤
-      if (categoriesResult.error) {
-        throw new Error(`載入類別資料失敗: ${categoriesResult.error.message}`);
-      }
-
-      if (productsResult.error) {
-        throw new Error(`載入商品資料失敗: ${productsResult.error.message}`);
-      }
-
-      // 轉換類別資料格式（從資料庫格式轉換為應用程式格式）
+      // 轉換類別資料格式
       // 「現貨區」放在「全部」之後，作為特殊分類
       const categories = [
         "全部",
         "現貨區",
-        ...categoriesResult.data.map((cat) => cat.name),
+        ...categoriesRes.data.map((cat) => cat.name),
       ];
 
-      // 轉換商品資料格式（來自資料庫）
-      const dbProducts = productsResult.data.map((product) => ({
+      // 轉換商品資料格式（來自 Worker API）
+      const dbProducts = productsRes.data.map((product) => ({
         id: product.id,
         name: product.name,
         price: product.price,
@@ -90,21 +70,21 @@ export function useProducts() {
         // 現貨區放在最後
         const isInStockA = a.category === "現貨區";
         const isInStockB = b.category === "現貨區";
-        
+
         if (isInStockA && !isInStockB) return 1;
         if (!isInStockA && isInStockB) return -1;
-        
+
         // 置頂優先
         const isPinnedA = a.is_pinned || false;
         const isPinnedB = b.is_pinned || false;
-        
+
         if (isPinnedA && !isPinnedB) return -1;
         if (!isPinnedA && isPinnedB) return 1;
-        
+
         // 按最後更新時間降序排列（越新的在前面）
         const timeA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
         const timeB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-        
+
         return timeB - timeA;
       });
 
@@ -112,7 +92,7 @@ export function useProducts() {
         categories,
         products: allProducts,
       };
-      
+
       // 更新快取時間
       lastFetchTime = Date.now();
     } catch (err) {
